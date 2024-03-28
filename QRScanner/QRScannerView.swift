@@ -214,7 +214,7 @@ public class QRScannerView: UIView {
         session.addInput(videoInput)
         metadataOutput.setMetadataObjectsDelegate(self, queue: metadataQueue)
         session.addOutput(metadataOutput)
-        metadataOutput.metadataObjectTypes = [.qr]
+        metadataOutput.metadataObjectTypes = [.qr, .dataMatrix]
 
         videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         videoDataOutput.setSampleBufferDelegate(self, queue: videoDataQueue)
@@ -339,7 +339,7 @@ extension QRScannerView: AVCaptureMetadataOutputObjectsDelegate {
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         guard metadataOutputEnable else { return }
         if let metadataObject = metadataObjects.first {
-            guard let readableObject = previewLayer?.transformedMetadataObject(for: metadataObject) as? AVMetadataMachineReadableCodeObject, metadataObject.type == .qr else { return }
+            guard let readableObject = previewLayer?.transformedMetadataObject(for: metadataObject) as? AVMetadataMachineReadableCodeObject, metadataObject.type == .qr || metadataObject.type == .dataMatrix else { return }
             guard let stringValue = readableObject.stringValue else { return }
             metadataOutputEnable = false
             videoDataOutputEnable = true
